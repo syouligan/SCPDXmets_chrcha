@@ -116,13 +116,13 @@ ggplot(data.frame(colData(raw_experiment)), aes(x = Lib_size, y = Sample, fill =
 
 ggplot(data.frame(colData(raw_experiment)), aes(x = Lib_size)) +
   geom_histogram() +
-  xlim(0, 10000) +
+  xlim(1, 10000) +
   theme_minimal() +
   ggsave("Library_size_histogram_raw_total_10000.pdf", useDingbats = FALSE)
 
 ggplot(data.frame(colData(raw_experiment)), aes(x = Lib_size, y = Sample, fill = Tissue)) +
   geom_density_ridges() +
-  xlim(0, 10000) +
+  xlim(1, 10000) +
   theme_minimal() +
   ggsave("Library_size_ridge_raw_10000.pdf", useDingbats = FALSE)
 
@@ -150,13 +150,13 @@ ggplot(data.frame(colData(raw_experiment)), aes(x = Genes_detected, y = Sample, 
 
 ggplot(data.frame(colData(raw_experiment)), aes(x = Genes_detected)) +
   geom_histogram() +
-  xlim(0, 1500) +
+  xlim(1, 1500) +
   theme_minimal() +
   ggsave("Number_of_genes_histogram_raw_total_1500.pdf", useDingbats = FALSE)
 
 ggplot(data.frame(colData(raw_experiment)), aes(x = Genes_detected, y = Sample, fill = Tissue)) +
   geom_density_ridges() +
-  xlim(0, 1500) +
+  xlim(1, 1500) +
   theme_minimal() +
   ggsave("Number_of_genes_ridge_raw_1500.pdf", useDingbats = FALSE)
 
