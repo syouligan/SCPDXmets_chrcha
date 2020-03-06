@@ -78,7 +78,7 @@ rownames(raw_experiment) <- uniquifyFeatureNames(rowData(raw_experiment)$Ensembl
 # Remove mouse cells
 stats <- perCellQCMetrics(raw_experiment, subsets=list(Human=which(rowData(raw_experiment)$Organism == "GRCh38")))
 raw_experiment$Human_percent <- stats$subsets_Human_percent
-raw_experiment$Human_cells <- raw_experiment$Human_percent >= 99
+raw_experiment$Human_cells <- raw_experiment$Human_percent >= 80
 ggplot(data.frame(colData(raw_experiment)), aes(x = Human_percent, y = Sample, fill = Tissue)) +
   geom_density_ridges() +
   theme_minimal() +
