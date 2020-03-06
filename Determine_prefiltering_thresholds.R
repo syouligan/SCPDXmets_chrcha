@@ -30,7 +30,6 @@ library('ggplot2')
 library('ggridges')
 library('viridis')
 library('Matrix')
-library('SAVER')
 library('stringr')
 
 # Load all data into single object
@@ -42,12 +41,12 @@ sample_IDs <- read.csv(paste0(location, "sarah_projects/SCPDXmets_chrcha/sample_
 # Load all samples and save before editing
 data_directory <- paste0(location, "sarah_projects/SCPDXmets_chrcha/raw_data/data")
 
-if(file.exists("all_data/Raw_experiment_all_samples_old_labels.rds")) {
-  raw_experiment <- readRDS("all_data/Raw_experiment_all_samples_old_labels.rds")
+if(file.exists("Raw_experiment_all_samples_old_labels.rds")) {
+  raw_experiment <- readRDS("Raw_experiment_all_samples_old_labels.rds")
 } else {
   raw_experiment <- read10xCounts(paste0(list.files(data_directory, full.names = TRUE), '/outs/filtered_feature_bc_matrix'), col.names = TRUE, sample.names = list.files(data_directory, full.names = FALSE))
   if (place == "wolfpack") {
-    saveRDS(raw_experiment, "all_data/Raw_experiment_all_samples_old_labels.rds")
+    saveRDS(raw_experiment, "Raw_experiment_all_samples_old_labels.rds")
   } else {
     print("Working local")
   }
@@ -89,13 +88,9 @@ raw_experiment <- raw_experiment[,which(raw_experiment$Human_cells)]
 # Remove mouse genes
 raw_experiment <- raw_experiment[which(rowData(raw_experiment)$Organism == "GRCh38"),]
 
-# Calculate SAVER stats of experiment. Remove genes with zero counts to speed up process.
-# --------------------------------------------------------------------------
-
 # Remove genes that have zero counts across all cells
 undetectedGenes <- rowSums(counts(raw_experiment)) == 0
 raw_experiment <- raw_experiment[!undetectedGenes, ] # Remove undetected genes
-
 
 # Plot cells based on distribution of Library size, gene number and mito content
 # --------------------------------------------------------------------------
@@ -108,20 +103,96 @@ raw_experiment$Genes_detected <- stats$detected
 raw_experiment$Mito_percent <- stats$subsets_Mito_percent
 
 # Plot QC stats
+
+ggplot(data.frame(colData(raw_experiment)), aes(x = Lib_size)) +
+  geom_histogram() +
+  theme_minimal() +
+  ggsave("Library_size_histogram_raw_total.pdf", useDingbats = FALSE)
+
 ggplot(data.frame(colData(raw_experiment)), aes(x = Lib_size, y = Sample, fill = Tissue)) +
   geom_density_ridges() +
   theme_minimal() +
   ggsave("Library_size_ridge_raw.pdf", useDingbats = FALSE)
+
+ggplot(data.frame(colData(raw_experiment)), aes(x = Lib_size)) +
+  geom_histogram() +
+  xlim(0, 10000) +
+  theme_minimal() +
+  ggsave("Library_size_histogram_raw_total_10000.pdf", useDingbats = FALSE)
+
+ggplot(data.frame(colData(raw_experiment)), aes(x = Lib_size, y = Sample, fill = Tissue)) +
+  geom_density_ridges() +
+  xlim(0, 10000) +
+  theme_minimal() +
+  ggsave("Library_size_ridge_raw_10000.pdf", useDingbats = FALSE)
+
+ggplot(data.frame(colData(raw_experiment)), aes(x = Lib_size)) +
+  geom_histogram() +
+  xlim(10000, 80000) +
+  theme_minimal() +
+  ggsave("Library_size_histogram_raw_total_80000.pdf", useDingbats = FALSE)
+
+ggplot(data.frame(colData(raw_experiment)), aes(x = Lib_size, y = Sample, fill = Tissue)) +
+  geom_density_ridges() +
+  xlim(10000, 80000) +
+  theme_minimal() +
+  ggsave("Library_size_ridge_raw_80000.pdf", useDingbats = FALSE)
+
+ggplot(data.frame(colData(raw_experiment)), aes(x = Genes_detected)) +
+  geom_histogram() +
+  theme_minimal() +
+  ggsave("Number_of_genes_histogram_raw_total.pdf", useDingbats = FALSE)
 
 ggplot(data.frame(colData(raw_experiment)), aes(x = Genes_detected, y = Sample, fill = Tissue)) +
   geom_density_ridges() +
   theme_minimal() +
   ggsave("Number_of_genes_ridge_raw.pdf", useDingbats = FALSE)
 
+ggplot(data.frame(colData(raw_experiment)), aes(x = Genes_detected)) +
+  geom_histogram() +
+  xlim(0, 1500) +
+  theme_minimal() +
+  ggsave("Number_of_genes_histogram_raw_total_1500.pdf", useDingbats = FALSE)
+
+ggplot(data.frame(colData(raw_experiment)), aes(x = Genes_detected, y = Sample, fill = Tissue)) +
+  geom_density_ridges() +
+  xlim(0, 1500) +
+  theme_minimal() +
+  ggsave("Number_of_genes_ridge_raw_1500.pdf", useDingbats = FALSE)
+
+ggplot(data.frame(colData(raw_experiment)), aes(x = Mito_percent)) +
+  geom_histogram() +
+  theme_minimal() +
+  ggsave("Mito_percent_histogram_raw_total.pdf", useDingbats = FALSE)
+
 ggplot(data.frame(colData(raw_experiment)), aes(x = Mito_percent, y = Sample, fill = Tissue)) +
   geom_density_ridges() +
   theme_minimal() +
   ggsave("Mito_percent_ridge_raw.pdf", useDingbats = FALSE)
+
+ggplot(data.frame(colData(raw_experiment)), aes(x=Lib_size, y=Genes_detected)) +
+  geom_hex(bins = 70) +
+  scale_color_viridis_c(option = "D") +
+  theme_bw() +
+  ggsave("Lib_size_vs_genes_density_raw_total.pdf", useDingbats = FALSE)
+
+ggplot(data.frame(colData(raw_experiment)), aes(x=Genes_detected, y=Mito_percent)) +
+  geom_hex(bins = 70) +
+  scale_color_viridis_c(option = "D") +
+  theme_bw() +
+  ggsave("Genes_vs_mito_density_raw_total.pdf", useDingbats = FALSE)
+
+ggplot(data.frame(colData(raw_experiment)), aes(x=Mito_percent, y=Lib_size)) +
+  geom_hex(bins = 70) +
+  scale_color_viridis_c(option = "D") +
+  theme_bw() +
+  ggsave("Lib_size_vs_mito_density_raw_total.pdf", useDingbats = FALSE)
+
+ggplot(data.frame(colData(raw_experiment)), aes(x=Lib_size, y=Genes_detected, color = Mito_percent)) +
+  geom_point() +
+  scale_color_viridis_c(option = "D") +
+  theme_bw() +
+  ggsave("Genes_vs_lib_size_vs_mito_raw_dotplot.pdf", useDingbats = FALSE)
 
 # Save practice dataset (5% of cells from each sample)
 raw_experiment$cellIDs <- rownames((colData(raw_experiment)))
@@ -132,14 +203,14 @@ raw_experiment$Practice_subset <- is.element(rownames(colData(raw_experiment)), 
 practice_exp <- raw_experiment[,which(raw_experiment$Practice_subset)]
 
 if (place == "wolfpack") {
-  saveRDS(practice_exp, "practice_all_data/Raw_experiment_all_samples_labeled_practice.rds")
+  saveRDS(practice_exp, "Raw_experiment_all_samples_labeled_practice.rds")
 } else {
   print("Working local")
 }
 
 # Save total raw dataset
 if (place == "wolfpack") {
-  saveRDS(raw_experiment, "all_data/Raw_experiment_all_samples_labeled.rds")
+  saveRDS(raw_experiment, "Raw_experiment_all_samples_labeled.rds")
 } else {
   print("Working local")
 }
