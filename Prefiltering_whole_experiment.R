@@ -53,7 +53,7 @@ raw_experiment$Lib_size <- stats$sum
 raw_experiment$Genes_detected <- stats$detected
 raw_experiment$Mito_percent <- stats$subsets_Mito_percent
 
-raw_experiment$Genes_percent_discard <- raw_experiment$Genes_detected < 1000
+raw_experiment$Genes_percent_discard <- raw_experiment$Genes_detected < 500
 sum(raw_experiment$Genes_percent_discard)
 raw_experiment$Libsize_percent_discard <- raw_experiment$Lib_size < 2500
 sum(raw_experiment$Libsize_percent_discard)

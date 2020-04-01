@@ -71,6 +71,14 @@ rowData(raw_experiment)$Organism <- as.character(ensembl_ids$Organism)
 rowData(raw_experiment)$Ensembl <- as.character(ensembl_ids$Ensembl)
 rowData(raw_experiment)$GeneSymbol <- as.character(gsub(".*_", "", rowData(raw_experiment)$Symbol))
 rownames(raw_experiment) <- uniquifyFeatureNames(rowData(raw_experiment)$Ensembl, rowData(raw_experiment)$GeneSymbol)
+data.frame(table(raw_experiment$Sample)) # Before removing empty drops
+
+# Remove empty droplets
+e.out <- emptyDrops(counts(raw_experiment))
+summary(e.out$FDR <= 0.001)
+table(Sig=e.out$FDR <= 0.001, Limited=e.out$Limited)
+raw_experiment <- raw_experiment[,which(e.out$FDR <= 0.001)]
+data.frame(table(raw_experiment$Sample)) # After removing empty drops
 
 # Remove mouse cells and mouse genes
 # --------------------------------------------------------------------------
@@ -84,6 +92,7 @@ ggplot(data.frame(colData(raw_experiment)), aes(x = Human_percent, y = Sample, f
   theme_minimal() +
   ggsave("Human_percent_ridge_raw.pdf", useDingbats = FALSE)
 raw_experiment <- raw_experiment[,which(raw_experiment$Human_cells)]
+data.frame(table(raw_experiment$Sample)) # After removing human cells
 
 # Remove mouse genes
 raw_experiment <- raw_experiment[which(rowData(raw_experiment)$Organism == "GRCh38"),]
